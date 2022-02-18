@@ -1,9 +1,9 @@
 ## ooproject
 
 virtual enviroment setup
-`bash
+```bash
 $ python3 -m virtualenv env
 $ source env/bin/activate
-$ pip install -r requirements.txt
-$ python3 main.py
-`
+(env) $ pip install -r requirements.txt
+(env) $ python3 main.py
+```
