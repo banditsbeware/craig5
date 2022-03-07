@@ -1,5 +1,6 @@
 import discord
 import logging
+import atexit
 import json
 import os
 from discord.ext import commands
@@ -18,6 +19,7 @@ bot.remove_command( 'help' )
 for f in os.listdir( './ext' ):
   if f.endswith( '.py' ):
     bot.load_extension( f'ext.{f[:-3]}' )
+    logging.info( f'ext.{f[:-3]} loaded')
 
 @bot.event
 async def on_ready():
