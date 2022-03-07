@@ -3,16 +3,8 @@ import os
 import json
 import regex as re
 
-from wolframclient.evaluation import WolframLanguageSession
-from wolframclient.language import wl, wlexpr
-
-with open('./config.json', 'r') as f:
-  config = json.load(f)
-
-
-def wolf_to_tex(expr):
-  expr = re.sub('Global`', '', expr)
-  return expr
+from wolfram import Wolfram
+WF = Wolfram()
 
 VR = re.compile( "^[a-df-z](?=[^a-z])|(?<=[^a-z])[a-df-z](?=[^a-z])|(?<=[^a-z])[a-df-z]$" )
 def variable( s ):
@@ -23,15 +15,11 @@ def variable( s ):
 class Calculus(commands.Cog, name='Calculus'):
   def __init__(self, bot):
     self.bot = bot
-    self.session = WolframLanguageSession(config["wolfram_path"])
 
-  def eval(self, expr):
-    return str( self.session.evaluate( wlexpr( expr ) ) )
-    
   # Formats user input for wolfram derivate function
   # assuming command format "derivative cos(x)"
   @commands.command(name="derivative", aliases=["d", "derive"])
-  async def derivative(self, ctx, args):
+  async def derivative(self, ctx, *, args):
 
     if args.find(',') == -1:
       var = variable( args )
@@ -45,7 +33,7 @@ class Calculus(commands.Cog, name='Calculus'):
     else:
       [func, var] = args.split(',')
 
-    result = self.eval( f'D[{ func }, { var }]' )
+    result = WF.evaluate( f'D[{ func }, { var }]' )
     await ctx.send( wolf_to_tex( result ) )
 
 
@@ -66,7 +54,7 @@ class Calculus(commands.Cog, name='Calculus'):
     else:
       [func, var] = args.split(',')
 
-    result = self.eval( f'Integrate[{ func }, { var }]' )
+    result = WF.evaluate( f'Integrate[{ func }, { var }]' )
     await ctx.send( wolf_to_tex( result ) )
 
 
@@ -81,7 +69,7 @@ class Calculus(commands.Cog, name='Calculus'):
     else:
       [func, var] = args.split(',')
 
-    result = self.eval( f'Limit[{ func }, { var }]' )
+    result = WF.evaluate( f'Limit[{ func }, { var }]' )
     await ctx.send( wolf_to_tex( result ) )
 
 
