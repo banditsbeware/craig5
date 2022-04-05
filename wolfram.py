@@ -13,9 +13,8 @@ class Wolfram():
     self.session.start()
 
   def evaluate( self, expr ):
-    result = str( self.session.evaluate( wlexpr( expr ) ) )
-    result = re.sub( 'Global`', '', result )
-    return result
+    result = self.session.evaluate( wlexpr( expr ) )
+    return self.session.evaluate( f'ToString[ TeXForm[{ result }] ]' )
 
   def terminate( self ):
     logging.info( 'terminating wolfram session' )

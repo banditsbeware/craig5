@@ -1,4 +1,5 @@
 from discord.ext import commands
+from discord import File
 import os
 import json
 import regex as re
@@ -7,6 +8,8 @@ import regex as re
 from wolfram import Wolfram
 WF = Wolfram()
 
+from texpng import *
+
 # Regular expression for determining the variable of an equation
 # For example, "2x+3" is in terms of "x"
 VR = re.compile( "^[a-df-z](?=[^a-z])|(?<=[^a-z])[a-df-z](?=[^a-z])|(?<=[^a-z])[a-df-z]$" )
@@ -14,6 +17,7 @@ def variable( s ):
   match = list( set( re.findall( VR, s ) ) )
   if len( match ) == 1: return match[0]
   return None
+
 
 # Define this cog for implementation in the parent bot
 class Calculus( commands.Cog, name='Calculus' ):
@@ -40,12 +44,13 @@ class Calculus( commands.Cog, name='Calculus' ):
       [ func, var ] = args.split( ',' )
     
     result = WF.evaluate( f'D[{ func }, { var }]' )
-    await ctx.send( result )
+    png = File( texpng( result ) )
+    await ctx.send( file=png )
 
 
   # Formats user input for wolfram integral function
   # assuming command format "integral 3x"
-  @commands.command( name="integral", aliases=["i", "integrate"] )
+  @commands.command( name="integral", aliases=["I", "i", "integrate"] )
   async def integral( self, ctx, *, args ):
     # Use regular expressions to determine the terms of variable input by the user
     # For example, "2x+3" is in terms of "x"
@@ -64,7 +69,8 @@ class Calculus( commands.Cog, name='Calculus' ):
       [ func, var ] = args.split( ',' )
 
     result = WF.evaluate( f'Integrate[{ func }, { var }]' )
-    await ctx.send( result )
+    png = File( texpng( result ) )
+    await ctx.send( file=png )
 
 
   # Formats user input for wolfram limit function
@@ -81,7 +87,83 @@ class Calculus( commands.Cog, name='Calculus' ):
       [ func, var ] = args.split( ',' )
 
     result = WF.evaluate( f'Limit[{ func }, { var }]' )
-    await ctx.send( result )
+    png = File( texpng( result ) )
+    await ctx.send( file=png )
+    
+
+  # Formats user input for the Wolfram Total Derivative function
+  # Assumes input format "totalderivative 3x x"
+  @commands.command( name = "totalderivative", aliases=["dt"] )
+  async def total_derivative( self, ctx, *, args ):
+    # use regular expressions to determine the terms of the variable input by the user
+    # for example, "2x+3" is in terms of "x"
+    if args.find( ',' ) == -1:
+      var = variable( args )
+
+      # if no variable is identified, display a help message for the user
+      if var is none:
+          await ctx.send( 'usage: `>dt f(x)` or `>dt f(x,y,z), x`' )
+          return
+
+      func = args
+    # if a correctly formatted input is detected, compute it
+    else:
+      [ func, var ] = args.split( ',' )
+
+    result = WF.evaluate( f'dt[{ func }, { var }]' )
+    png = File( texpng( result ) )
+    await ctx.send( file=png )
+
+
+  # Formats user input for the Wolfram Max Limit function
+  # Assumes input "maxl 3x, x -> 3"
+  @commands.command( name="maxlimit", aliases=["maxl"] )
+  async def max_limit( self, ctx, *, args ):
+    # Use regular expressions to determine the terms of variable input by the user
+    # For example, "2x+3" is in terms of "x"
+    if args.find( ',' ) == -1:
+      var = variable( args )
+      
+      # If no variable is determined, display a help message to the user
+      if var is None: 
+        await ctx.send( 'Usage: `>maxlimit f(x), x -> h`' )
+        return 
+
+      func = args
+    
+    # If a valid command is detected, compute it
+    else:
+      [ func, var ] = args.split( ',' )
+
+    result = WF.evaluate( f'MaxLimit[{ func }, { var }]' )
+    png = File( texpng( result ) )
+    await ctx.send( file=png )
+
+
+  # Formats user input for the Wolfram Min Limit function
+  # Assumes input "minl 3x, x -> 3"
+  @commands.command( name="minlimit", aliases=["minl", "minimuml", "minimumlimit"] )
+  async def min_limit( self, ctx, *, args ):
+    # Use regular expressions to determine the terms of variable input by the user
+    # For example, "2x+3" is in terms of "x"
+    if args.find( ',' ) == -1:
+      var = variable( args )
+      
+      # If no variable is determined, display a help message to the user
+      if var is None: 
+        await ctx.send( 'Usage: `>minlimit f(x), x -> h`' )
+        return 
+
+      func = args
+    
+    # If a valid command is detected, compute it
+    else:
+      [ func, var ] = args.split( ',' )
+
+    result = WF.evaluate( f'MinLimit[{ func }, { var }]' )
+    png = File( texpng( result ) )
+    await ctx.send( file=png )
+
 
 # Include this library as part of the parent bot
 def setup( bot ):
