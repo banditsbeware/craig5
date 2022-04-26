@@ -5,7 +5,7 @@ import json
 import os
 from discord.ext import commands
 
-logging.basicConfig( level=logging.DEBUG )
+logging.basicConfig( level=logging.INFO )
 
 with open( './config.json', 'r' ) as f: config = json.load( f )
 

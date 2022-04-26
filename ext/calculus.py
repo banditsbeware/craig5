@@ -18,6 +18,12 @@ def variable( s ):
   if len( match ) == 1: return match[0]
   return None
 
+# interpret user input
+def input_intr( s ):
+  
+  pass
+  
+
 
 # Define this cog for implementation in the parent bot
 class Calculus( commands.Cog, name='Calculus' ):
@@ -44,7 +50,7 @@ class Calculus( commands.Cog, name='Calculus' ):
       [ func, var ] = args.split( ',' )
     
     result = WF.evaluate( f'D[{ func }, { var }]' )
-    png = File( texpng( result ) )
+    png = File( texpng( r' \frac{d}{dx}\left [  ' + func + r'\right ] = ' + result ) )
     await ctx.send( file=png )
 
 
@@ -69,7 +75,7 @@ class Calculus( commands.Cog, name='Calculus' ):
       [ func, var ] = args.split( ',' )
 
     result = WF.evaluate( f'Integrate[{ func }, { var }]' )
-    png = File( texpng( result ) )
+    png = File( texpng( r'\int ' + func + f'd{var} = ' + result  ) )
     await ctx.send( file=png )
 
 
@@ -87,7 +93,7 @@ class Calculus( commands.Cog, name='Calculus' ):
       [ func, var ] = args.split( ',' )
 
     result = WF.evaluate( f'Limit[{ func }, { var }]' )
-    png = File( texpng( result ) )
+    png = File( texpng( r'\lim_{' + var.replace('->', r'\to') + '} ' + f'{func} = {result}' ) )
     await ctx.send( file=png )
     
 
